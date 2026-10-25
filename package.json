@@ -1,0 +1,28 @@
+{
+  "name": "dsh-liquid-glass",
+  "description": "透明折射「液态玻璃」聊天框与工具栏 + MPKG 动态壁纸（DeepSeek Harness 美化插件 / Liquid-glass chat box & toolbar with MPKG dynamic wallpaper）",
+  "version": "0.5.2",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "README.md"
+  ]
+}
