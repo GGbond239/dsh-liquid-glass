@@ -64,6 +64,14 @@
    - `dsh.profile.bundles` 数组增加 `"dsh-liquid-glass"`
 4. 重启 DeepSeek Harness 生效
 
+**一键安装（推荐）**：仓库根目录提供 `install.ps1`，在解压后的目录里执行：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File install.ps1
+```
+
+脚本会自动完成：放置插件目录 + 修改 profile 的 `package.json`（`dependencies` 与 `dsh.profile.bundles` 两处），并备份原配置为 `package.json.bak`。使用非默认 profile 时加 `-ProfileName <名称>`。
+
 若希望改动即时生效，可将安装目录做成目录联接（junction），并在 profile 的 `cordis.patch.yml` 中加入**插入式**补丁（没有 `insert` 的条目只会覆盖已存在的 `id`，找不到会被静默跳过）：
 
 ```yaml
@@ -110,3 +118,21 @@
 - 网页类型壁纸在 iframe 里可能加载不全外部资源（沙箱只允许脚本，不允许同源访问）。
 - `.mkv` / `.mov` / `.avi` 在 Chromium 里通常解不出来，会提示改用 `mp4` / `webm`。
 - 玻璃化依赖 DSH 现有的 DOM 钩子（`data-composer-card`、`header:has(> [data-conversation-header-leading])` 等）。这些是当前版本 UIDOM 的稳定特征，但 DSH 大版本升级后可能变化——此时用设置页的「附加玻璃选择器」即可补上，或改 `lib/client.js` 里的 `SURFACES` 表。
+
+---
+
+## 常见问题 / Troubleshooting
+
+**安装后插件完全不生效 / 不出现在启动图里**
+- 检查 `node_modules\dsh-liquid-glass` 目录是否存在，目录名不能多一层嵌套（应为 `node_modules\dsh-liquid-glass\lib\...`）；
+- 检查 profile 的 `package.json` 是否**同时**修改了两处：`dependencies` 与 `dsh.profile.bundles`，缺一处都会被静默跳过；
+- 重启 DeepSeek Harness（不是刷新页面）。
+
+**启动时报「找不到包 dsh-liquid-glass / Cannot find module」**
+- 本插件未发布到 npm registry，`package.json` 里的依赖条目是声明式的。若你的 DSH 或包管理器在启动时自动执行 `npm install`，会尝试从 registry 拉取并失败。解决：关闭自动安装，或先手动把 `dsh-liquid-glass` 目录放进 `node_modules` 再启动；若安装流程已把目录清掉，重放一次并跳过 install 步骤。
+
+**安装后部分玻璃化失效 / 壁纸看不到**
+- DSH 大版本升级后 UIDOM 的 DOM 钩子（`data-composer-card`、CSS-module 后缀等）可能变化。打开「设置 → 液态玻璃 → 诊断」查看当前实际生效的表面与能力，再用「附加玻璃选择器」补上缺失的表面，或提交 Issue 时附上 DSH 版本信息。
+
+**我的 profile 不是 desktop**
+- 安装说明中的路径与配置文件均针对默认 `desktop` profile；使用其他 profile 时，把 `node_modules` 与 `package.json` 换成对应 profile 的路径即可（`install.ps1` 可用 `-ProfileName <名称>` 指定）。
